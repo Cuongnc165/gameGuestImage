@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Mở Ảnh</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #000;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #fff;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+      }
+
+      h1 {
+        text-align: center;
+        color: #fff;
+        margin-bottom: 20px;
+        font-size: 36px;
+        letter-spacing: 2px;
+      }
+
+      .keyword-section {
+        background: #1a1a1a;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 2px solid #333;
+      }
+
+      .keyword-title {
+        text-align: center;
+        font-size: 18px;
+        color: #aaa;
+        margin-bottom: 15px;
+      }
+
+      .keyword-display {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .keyword-letter {
+        width: 40px;
+        height: 50px;
+        background: #000;
+        border: 2px solid #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+        border-radius: 5px;
+      }
+
+      .keyword-letter.revealed {
+        background: #fff;
+        color: #000;
+        animation: revealLetter 0.5s ease-in-out;
+      }
+
+      @keyframes revealLetter {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+      }
+
+      .image-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 10px;
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #333;
+        aspect-ratio: 3/2;
+      }
+
+      .image-piece {
+        position: relative;
+        background: #000;
+        border: 2px solid #333;
+        border-radius: 5px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .image-piece:hover {
+        transform: scale(1.05);
+        border-color: #fff;
+      }
+
+      .image-piece.revealed .cover {
+        display: none;
+      }
+
+      .image-piece.revealed .number {
+        display: none;
+      }
+
+      .cover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+        border: 2px solid #fff;
+      }
+
+      .number {
+        font-size: 48px;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      .image-content {
+        width: 100%;
+        height: 100%;
+        background-size: 300% 200%;
+        background-position: center;
+      }
+
+      .image-piece:nth-child(1) .image-content {
+        background-position: 0% 0%;
+      }
+      .image-piece:nth-child(2) .image-content {
+        background-position: 50% 0%;
+      }
+      .image-piece:nth-child(3) .image-content {
+        background-position: 100% 0%;
+      }
+      .image-piece:nth-child(4) .image-content {
+        background-position: 0% 100%;
+      }
+      .image-piece:nth-child(5) .image-content {
+        background-position: 50% 100%;
+      }
+      .image-piece:nth-child(6) .image-content {
+        background-position: 100% 100%;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: #1a1a1a;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        width: 90%;
+        position: relative;
+        border: 2px solid #fff;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 30px;
+        cursor: pointer;
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        transition: all 0.3s;
+        border: 2px solid #fff;
+      }
+
+      .close-btn:hover {
+        background: #fff;
+        color: #000;
+      }
+
+      /* MỚI: Trả lại kích thước đồng hồ */
+      .timer-display {
+        width: 50px;
+        height: 50px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px; /* Trả lại font size */
+        font-weight: bold;
+        margin: 0 auto 20px;
+        color: #fff;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .timer-display.ending {
+        border-color: #ff0000;
+        color: #ff0000;
+        animation: pulseWarning 0.7s infinite ease-in-out;
+      }
+
+      @keyframes pulseWarning {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.7;
+        }
+      }
+
+      .question {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        color: #fff;
+        text-align: center;
+      }
+
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .option {
+        padding: 15px 20px;
+        background: #000;
+        border: 2px solid #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 16px;
+        color: #fff;
+      }
+
+      .option:hover {
+        background: #333;
+        transform: translateX(5px);
+      }
+
+      .option.disabled {
+        cursor: not-allowed;
+      }
+
+      .option.correct {
+        border-color: #00ff00 !important;
+        background: #00ff00 !important;
+        color: #000 !important;
+        animation: flashCorrect 0.5s ease-in-out 2;
+      }
+
+      .option.incorrect {
+        border-color: #ff0000 !important;
+        background: #ff0000 !important;
+        color: #fff !important;
+        animation: flashIncorrect 0.5s ease-in-out 2;
+      }
+
+      @keyframes flashCorrect {
+        0%,
+        100% {
+          background: #00ff00;
+          color: #000;
+          border-color: #00ff00;
+        }
+        50% {
+          background: #00cc00;
+          color: #000;
+          border-color: #00cc00;
+        }
+      }
+
+      @keyframes flashIncorrect {
+        0%,
+        100% {
+          background: #ff0000;
+          color: #fff;
+          border-color: #ff0000;
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        50% {
+          background: #cc0000;
+          border-color: #cc0000;
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="keyword-section">
+        <div class="keyword-title">TỪ KHÓA BÍ MẬT</div>
+        <div class="keyword-display" id="keywordDisplay"></div>
+      </div>
+
+      <div class="image-grid" id="imageGrid">
+        <div class="image-piece" data-number="1">
+          <div class="cover">
+            <div class="number">1</div>
+          </div>
+          <div class="image-content"></div>
+        </div>
+        <div class="image-piece" data-number="2">
+          <div class="cover">
+            <div class="number">2</div>
+          </div>
+          <div class="image-content"></div>
+        </div>
+        <div class="image-piece" data-number="3">
+          <div class="cover">
+            <div class="number">3</div>
+          </div>
+          <div class="image-content"></div>
+        </div>
+        <div class="image-piece" data-number="4">
+          <div class="cover">
+            <div class="number">4</div>
+          </div>
+          <div class="image-content"></div>
+        </div>
+        <div class="image-piece" data-number="5">
+          <div class="cover">
+            <div class="number">5</div>
+          </div>
+          <div class="image-content"></div>
+        </div>
+        <div class="image-piece" data-number="6">
+          <div class="cover">
+            <div class="number">6</div>
+          </div>
+          <div class="image-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeBtn">&times;</span>
+        <div class="timer-display" id="timerDisplay">15</div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+      </div>
+    </div>
+
+    <script>
+      // Link ảnh cố định
+      const imageUrl =
+        "https://media-cdn-v2.laodong.vn/storage/newsportal/2023/8/26/1233821/Giai-Nhi-1--Nang-Tre.jpg?w=800&crop=auto&scale=both";
+
+      // Từ khóa bí mật
+      const keyword = "VIET NAM TO";
+
+      // Danh sách câu hỏi
+      const allQuestions = [
+        {
+          question: "Thủ đô của Việt Nam là gì?",
+          options: ["Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Huế"],
+          correct: 0,
+        },
+        {
+          question: "2 + 2 = ?",
+          options: ["3", "4", "5", "6"],
+          correct: 1,
+        },
+        {
+          question: "Màu của bầu trời là gì?",
+          options: ["Đỏ", "Vàng", "Xanh", "Trắng"],
+          correct: 2,
+        },
+        {
+          question: "Hành tinh nào lớn nhất hệ mặt trời?",
+          options: ["Trái Đất", "Sao Hỏa", "Sao Mộc", "Sao Thổ"],
+          correct: 2,
+        },
+        {
+          question: "1 + 1 = ?",
+          options: ["1", "2", "3", "4"],
+          correct: 1,
+        },
+        {
+          question: "Động vật nào có vòi?",
+          options: ["Sư tử", "Voi", "Hổ", "Gấu"],
+          correct: 1,
+        },
+        {
+          question: "3 x 3 = ?",
+          options: ["6", "9", "12", "15"],
+          correct: 1,
+        },
+        {
+          question: "Nước nào có tháp Eiffel?",
+          options: ["Anh", "Pháp", "Ý", "Đức"],
+          correct: 1,
+        },
+        {
+          question: "10 - 5 = ?",
+          options: ["3", "4", "5", "6"],
+          correct: 2,
+        },
+        {
+          question: "Con vật nào bay được?",
+          options: ["Chó", "Mèo", "Chim", "Cá"],
+          correct: 2,
+        },
+        {
+          question: "Số ngày trong một tuần?",
+          options: ["5", "6", "7", "8"],
+          correct: 2,
+        },
+        {
+          question: "Màu của lá cây là gì?",
+          options: ["Đỏ", "Xanh", "Vàng", "Đen"],
+          correct: 1,
+        },
+      ];
+
+      let currentPiece = null;
+      let answeredCorrectly = false;
+      let revealedLetters = [];
+      let answeredQuestions = [];
+      let availableQuestions = [...allQuestions];
+
+      const TIME_LIMIT = 15;
+      let timeLeft = TIME_LIMIT;
+      let timerInterval = null;
+      let isPaused = false;
+      let isTimerStarted = false; // MỚI: Biến kiểm tra timer đã chạy lần đầu chưa
+
+      // Khởi tạo ảnh
+      const pieces = document.querySelectorAll(".image-content");
+      pieces.forEach((piece) => {
+        piece.style.backgroundImage = `url(${imageUrl})`;
+      });
+
+      // Khởi tạo hiển thị từ khóa
+      function initKeyword() {
+        const display = document.getElementById("keywordDisplay");
+        display.innerHTML = "";
+        for (let i = 0; i < keyword.length; i++) {
+          const letterDiv = document.createElement("div");
+          letterDiv.className = "keyword-letter";
+          letterDiv.dataset.index = i;
+          letterDiv.textContent = "_";
+          display.appendChild(letterDiv);
+        }
+      }
+
+      // Hiển thị chữ cái ngẫu nhiên
+      function revealRandomLetters() {
+        const lettersPerCorrect = Math.ceil(keyword.length / 6);
+        const unrevealedIndices = [];
+        for (let i = 0; i < keyword.length; i++) {
+          if (!revealedLetters.includes(i)) {
+            unrevealedIndices.push(i);
+          }
+        }
+        let count = 0;
+        while (count < lettersPerCorrect && unrevealedIndices.length > 0) {
+          const randomIdx = Math.floor(
+            Math.random() * unrevealedIndices.length
+          );
+          const letterIndex = unrevealedIndices[randomIdx];
+          revealedLetters.push(letterIndex);
+          const letterDiv = document.querySelector(
+            `.keyword-letter[data-index="${letterIndex}"]`
+          );
+          letterDiv.textContent = keyword[letterIndex];
+          letterDiv.classList.add("revealed");
+          unrevealedIndices.splice(randomIdx, 1);
+          count++;
+        }
+      }
+
+      // Lấy câu hỏi ngẫu nhiên
+      function getRandomQuestion() {
+        if (availableQuestions.length === 0) {
+          availableQuestions = allQuestions.filter(
+            (_, index) => !answeredQuestions.includes(index)
+          );
+        }
+        if (availableQuestions.length === 0) return null;
+        const randomIndex = Math.floor(
+          Math.random() * availableQuestions.length
+        );
+        return availableQuestions[randomIndex];
+      }
+
+      // Xử lý click vào từng phần ảnh
+      document.querySelectorAll(".image-piece").forEach((piece) => {
+        piece.addEventListener("click", function () {
+          if (this.classList.contains("revealed")) return;
+
+          const questionData = getRandomQuestion();
+          if (!questionData) {
+            alert("Bạn đã trả lời đúng tất cả câu hỏi!");
+            return;
+          }
+
+          currentPiece = this;
+          answeredCorrectly = false;
+
+          document.getElementById("question").textContent =
+            questionData.question;
+          const optionsContainer = document.getElementById("options");
+          optionsContainer.innerHTML = "";
+
+          questionData.options.forEach((option, index) => {
+            const optionDiv = document.createElement("div");
+            optionDiv.className = "option";
+            optionDiv.textContent = option;
+            optionDiv.addEventListener("click", () =>
+              handleAnswer(index, questionData.correct, optionDiv, questionData)
+            );
+            optionsContainer.appendChild(optionDiv);
+          });
+
+          document.getElementById("modal").classList.add("active");
+
+          /* MỚI: Reset trạng thái đồng hồ, không tự chạy */
+          clearInterval(timerInterval);
+          timerInterval = null;
+          isTimerStarted = false;
+          isPaused = false;
+          timeLeft = TIME_LIMIT;
+          const timerDisplay = document.getElementById("timerDisplay");
+          timerDisplay.textContent = timeLeft;
+          timerDisplay.classList.remove("ending");
+        });
+      });
+
+      /* MỚI: Hàm chỉ chứa logic đếm ngược */
+      function startCountdown() {
+        const timerDisplay = document.getElementById("timerDisplay");
+        isPaused = false;
+
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          timerDisplay.textContent = timeLeft;
+
+          if (timeLeft <= 5) {
+            timerDisplay.classList.add("ending");
+          }
+
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timerDisplay.textContent = "0"; // MỚI: Hiển thị số 0
+            timerDisplay.classList.add("ending"); // Đảm bảo số 0 màu đỏ
+          }
+        }, 1000);
+      }
+
+      /* MỚI: Thêm sự kiện click cho đồng hồ để Tạm dừng/Tiếp tục */
+      document
+        .getElementById("timerDisplay")
+        .addEventListener("click", function () {
+          // Nếu đã trả lời (có đáp án bị disabled) thì không làm gì cả
+          if (document.querySelector(".option.disabled")) {
+            return;
+          }
+
+          if (!isTimerStarted) {
+            // Lần click đầu tiên -> Bắt đầu chạy
+            isTimerStarted = true;
+            startCountdown();
+          } else if (timerInterval) {
+            // Đang chạy -> Tạm dừng
+            clearInterval(timerInterval);
+            timerInterval = null;
+            isPaused = true;
+            // MỚI: Không đổi text, cứ để nguyên số
+          } else if (isPaused) {
+            // Đang tạm dừng -> Chạy tiếp
+            // (Không chạy tiếp nếu đã hết giờ)
+            if (timeLeft > 0) {
+              startCountdown();
+            }
+          }
+        });
+
+      // Xử lý câu trả lời
+      function handleAnswer(
+        selectedIndex,
+        correctIndex,
+        optionElement,
+        questionData
+      ) {
+        // Chỉ chạy nếu đáp án chưa bị disabled
+        if (optionElement.classList.contains("disabled")) {
+          return;
+        }
+
+        // Dừng bộ đếm giờ
+        clearInterval(timerInterval);
+        timerInterval = null;
+        isPaused = false;
+        isTimerStarted = false; // Reset
+        document.getElementById("timerDisplay").classList.remove("ending");
+
+        // Vô hiệu hóa tất cả lựa chọn
+        const allOptions = document.querySelectorAll(".option");
+        allOptions.forEach((opt) => opt.classList.add("disabled"));
+
+        if (selectedIndex === correctIndex) {
+          optionElement.classList.add("correct");
+          answeredCorrectly = true;
+          const questionIndex = allQuestions.indexOf(questionData);
+          if (!answeredQuestions.includes(questionIndex)) {
+            answeredQuestions.push(questionIndex);
+          }
+          const availableIndex = availableQuestions.indexOf(questionData);
+          if (availableIndex > -1) {
+            availableQuestions.splice(availableIndex, 1);
+          }
+        } else {
+          optionElement.classList.add("incorrect");
+          allOptions[correctIndex].classList.add("correct");
+          answeredCorrectly = false;
+        }
+      }
+
+      // Xử lý đóng modal
+      document
+        .getElementById("closeBtn")
+        .addEventListener("click", function () {
+          // Dừng bộ đếm giờ
+          clearInterval(timerInterval);
+          timerInterval = null;
+          isPaused = false;
+          isTimerStarted = false; // Reset
+
+          document.getElementById("modal").classList.remove("active");
+
+          if (answeredCorrectly && currentPiece) {
+            currentPiece.classList.add("revealed");
+            revealRandomLetters();
+          }
+
+          currentPiece = null;
+          answeredCorrectly = false;
+
+          // Xóa các class animation và style
+          document.querySelectorAll(".option").forEach((opt) => {
+            opt.classList.remove("correct", "incorrect", "disabled");
+          });
+          document.getElementById("timerDisplay").classList.remove("ending");
+        });
+
+      // Đóng modal khi click bên ngoài
+      document.getElementById("modal").addEventListener("click", function (e) {
+        if (e.target === this) {
+          document.getElementById("closeBtn").click();
+        }
+      });
+
+      // Khởi tạo game
+      initKeyword();
+    </script>
+  </body>
+</html>
