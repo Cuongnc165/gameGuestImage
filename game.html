@@ -23,7 +23,7 @@
       }
 
       .container {
-        max-width: 800px;
+        max-width: 730px;
         width: 100%;
       }
 
@@ -48,6 +48,15 @@
         font-size: 18px;
         color: #aaa;
         margin-bottom: 15px;
+      }
+
+      .keyword-score {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: #ffc107; /* Màu vàng cam cho nổi bật */
+        margin-bottom: 15px;
+        letter-spacing: 1px;
       }
 
       .keyword-display {
@@ -217,7 +226,6 @@
         color: #000;
       }
 
-      /* MỚI: Trả lại kích thước đồng hồ */
       .timer-display {
         width: 50px;
         height: 50px;
@@ -226,7 +234,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 24px; /* Trả lại font size */
+        font-size: 24px;
         font-weight: bold;
         margin: 0 auto 20px;
         color: #fff;
@@ -333,54 +341,78 @@
           transform: translateX(5px);
         }
       }
+
+      /* (SỬA) CSS CHO NÚT HIỂN THỊ ĐÁP ÁN - ĐÃ DI CHUYỂN */
+      .show-answer-btn {
+        position: fixed; /* Cố định trên màn hình */
+        top: 50%; /* Căn giữa theo chiều dọc */
+        left: 20px; /* Cách lề trái 20px */
+        transform: translateY(-50%); /* Tinh chỉnh căn giữa */
+        z-index: 900; /* Nằm dưới modal (1000) */
+
+        display: block;
+        width: auto; /* Tự co giãn chiều rộng */
+        padding: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #000;
+        background-color: #ffc107; /* Màu vàng cam */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s;
+      }
+
+      .show-answer-btn:hover:not(:disabled) {
+        background-color: #ffa000;
+        transform: translateY(-50%) scale(1.05); /* Thêm scale khi hover */
+      }
+
+      .show-answer-btn:disabled {
+        background-color: #555;
+        color: #aaa;
+        cursor: not-allowed;
+      }
+      /* (HẾT PHẦN SỬA) */
     </style>
   </head>
   <body>
     <div class="container">
       <div class="keyword-section">
         <div class="keyword-title">TỪ KHÓA BÍ MẬT</div>
+        <!-- <div class="keyword-score" id="keywordScore"></div> -->
         <div class="keyword-display" id="keywordDisplay"></div>
       </div>
 
       <div class="image-grid" id="imageGrid">
         <div class="image-piece" data-number="1">
-          <div class="cover">
-            <div class="number">1</div>
-          </div>
+          <div class="cover"><div class="number">1</div></div>
           <div class="image-content"></div>
         </div>
         <div class="image-piece" data-number="2">
-          <div class="cover">
-            <div class="number">2</div>
-          </div>
+          <div class="cover"><div class="number">2</div></div>
           <div class="image-content"></div>
         </div>
         <div class="image-piece" data-number="3">
-          <div class="cover">
-            <div class="number">3</div>
-          </div>
+          <div class="cover"><div class="number">3</div></div>
           <div class="image-content"></div>
         </div>
         <div class="image-piece" data-number="4">
-          <div class="cover">
-            <div class="number">4</div>
-          </div>
+          <div class="cover"><div class="number">4</div></div>
           <div class="image-content"></div>
         </div>
         <div class="image-piece" data-number="5">
-          <div class="cover">
-            <div class="number">5</div>
-          </div>
+          <div class="cover"><div class="number">5</div></div>
           <div class="image-content"></div>
         </div>
         <div class="image-piece" data-number="6">
-          <div class="cover">
-            <div class="number">6</div>
-          </div>
+          <div class="cover"><div class="number">6</div></div>
           <div class="image-content"></div>
         </div>
       </div>
     </div>
+    <button class="show-answer-btn" id="showAnswerBtn">HIỂN THỊ ĐÁP ÁN</button>
 
     <div class="modal" id="modal">
       <div class="modal-content">
@@ -392,74 +424,237 @@
     </div>
 
     <script>
-      // Link ảnh cố định
+      // ... (Phần link ảnh, từ khóa, danh sách câu hỏi giữ nguyên) ...
       const imageUrl =
-        "https://media-cdn-v2.laodong.vn/storage/newsportal/2023/8/26/1233821/Giai-Nhi-1--Nang-Tre.jpg?w=800&crop=auto&scale=both";
-
-      // Từ khóa bí mật
-      const keyword = "VIET NAM TO";
-
-      // Danh sách câu hỏi
+        "https://images.vietnamtourism.gov.vn/vn//images/2019/CNMN/19.5._Dep_me_man_canh_dep_Viet_Nam_1.jpg";
+      const keyword = "DATNUOC";
       const allQuestions = [
         {
-          question: "Thủ đô của Việt Nam là gì?",
-          options: ["Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Huế"],
+          id: 1,
+          question:
+            "Bối cảnh lịch sử nào sau đây là nguyên nhân trực tiếp dẫn đến việc Việt Nam khởi xướng công cuộc Đổi mới năm 1986?",
+          options: [
+            "A. Việt Nam muốn hội nhập quốc tế và gia nhập ASEAN.",
+            "B. Nền kinh tế khủng hoảng, lạm phát phi mã, sản xuất trì trệ và cơ chế bao cấp không còn phù hợp.",
+            "C. Việt Nam bị ảnh hưởng bởi sự tan rã của Liên Xô.",
+            "D. Áp lực cạnh tranh từ các nền kinh tế mới nổi Đông Á.",
+          ],
+          correct: 1,
+        },
+        {
+          id: 2,
+          question:
+            "Theo số liệu của Tổng cục Thống kê (2024), quy mô GDP của Việt Nam đạt khoảng 476,3 tỷ USD. Con số này thể hiện rõ nhất yếu tố nào trong nhận định của Tổng Bí thư Nguyễn Phú Trọng?",
+          options: ["A. Tiềm lực", "B. Cơ đồ", "C. Uy tín", "D. Vị thế"],
+          correct: 1,
+        },
+        {
+          id: 3,
+          question:
+            "So với năm 1986 – thời điểm bắt đầu Đổi mới – nền kinh tế Việt Nam năm 2024 đã tăng trưởng khoảng bao nhiêu lần (tính theo GDP danh nghĩa bằng USD)?",
+          options: [
+            "A. Khoảng 50 lần",
+            "B. Khoảng 80 lần",
+            "C. Khoảng 100 lần",
+            "D. Khoảng 200 lần",
+          ],
+          correct: 2,
+        },
+        {
+          id: 4,
+          question:
+            "Sau năm 1975, Việt Nam gặp khó khăn kinh tế – xã hội chủ yếu vì:",
+          options: [
+            "A. Tác động của Chiến tranh lạnh và bị bao vây, cấm vận quốc tế.",
+            "B. Chính sách công nghiệp hóa tập trung quá nhanh.",
+            "C. Thiếu tài nguyên thiên nhiên.",
+            "D. Tỷ lệ dân số tăng chậm.",
+          ],
           correct: 0,
         },
         {
-          question: "2 + 2 = ?",
-          options: ["3", "4", "5", "6"],
-          correct: 1,
-        },
-        {
-          question: "Màu của bầu trời là gì?",
-          options: ["Đỏ", "Vàng", "Xanh", "Trắng"],
+          id: 5,
+          question:
+            "Cụm từ “chưa bao giờ có được cơ đồ, tiềm lực, vị thế và uy tín quốc tế như ngày nay” của Tổng Bí thư Nguyễn Phú Trọng được tuyên bố tại:",
+          options: [
+            "A. Đại hội XII (năm 2016)",
+            "B. Hội nghị Trung ương 4 khóa XIII",
+            "C. Đại hội XIII của Đảng Cộng sản Việt Nam (năm 2021)",
+            "D. Hội nghị Tổng kết công tác Đối ngoại năm 2022",
+          ],
           correct: 2,
         },
         {
-          question: "Hành tinh nào lớn nhất hệ mặt trời?",
-          options: ["Trái Đất", "Sao Hỏa", "Sao Mộc", "Sao Thổ"],
+          id: 6,
+          question:
+            "Mốc quan hệ Đối tác Chiến lược Toàn diện với quốc gia cuối cùng (tháng 10/2025) là với:",
+          options: ["A. Vương Quốc Anh", "B. Hoa Kỳ", "C. Pháp", "D. Nhật Bản"],
+          correct: 0,
+        },
+        {
+          id: 7,
+          question:
+            "Việt Nam từ 2007 đến nay chuyển từ người 'chấp nhận luật chơi' sang 'kiến tạo luật chơi' có nghĩa là:",
+          options: [
+            "A. Đã hoàn toàn thoát khỏi sự phụ thuộc vào Trung Quốc",
+            "B. Sẵn sàng chấp nhận các cam kết tiêu chuẩn cao hơn WTO",
+            "C. Tốc độ tăng trưởng thương mại nhanh nhất ASEAN",
+            "D. Doanh nghiệp Việt đủ năng lực cạnh tranh với đa quốc gia",
+          ],
+          correct: 1,
+        },
+        {
+          id: 8,
+          question:
+            "Đường lối đối ngoại 'đa dạng hóa, đa phương hóa' phát triển thành phương châm nào?",
+          options: [
+            "A. Chủ động, tích cực hội nhập quốc tế toàn diện, sâu rộng và hiệu quả",
+            "B. Tham gia các tổ chức khu vực như ASEAN, APEC",
+            "C. Đảm bảo ưu tiên nội lực và tăng trưởng kinh tế xanh",
+            "D. Xây dựng ngoại giao kinh tế vì lợi ích quốc gia",
+          ],
+          correct: 0,
+        },
+        {
+          id: 9,
+          question:
+            "Vốn FDI thực hiện năm 2024 đạt hơn 23 tỷ USD, nếu vốn cam kết giảm mạnh thì niềm tin nhà đầu tư có bị phủ nhận ngay không?",
+          options: [
+            "A. Chắc chắn có",
+            "B. Hoàn toàn không",
+            "C. Chỉ ảnh hưởng đến các ngành mới",
+            "D. Tùy lý do chất lượng dự án",
+          ],
+          correct: 1,
+        },
+        {
+          id: 10,
+          question:
+            "Việt Nam xuất siêu hơn 28 tỷ USD năm 2023, làm thế nào phân biệt sức mạnh nội tại với phụ thuộc FDI?",
+          options: [
+            "A. Không có sự khác biệt lớn",
+            "B. Xuất khẩu chủ yếu từ FDI là dấu hiệu phụ thuộc",
+            "C. Tiềm lực là khả năng hấp thụ chuỗi cung ứng",
+            "D. Chỉ cần đạt thặng dư là đủ",
+          ],
           correct: 2,
         },
         {
-          question: "1 + 1 = ?",
-          options: ["1", "2", "3", "4"],
+          id: 11,
+          question:
+            "GDP bình quân đầu người tăng từ 200 USD (1994) lên 4.300 USD (2023), sự chênh lệch giữa thành thị và nông thôn 5 lần cho thấy:",
+          options: [
+            "A. Vẫn là thành tựu toàn dân",
+            "B. Thất bại của tiềm lực nhân văn",
+            "C. Tăng trưởng thành phố hỗ trợ nông thôn",
+            "D. Nguy cơ bất bình đẳng xã hội",
+          ],
+          correct: 3,
+        },
+        {
+          id: 12,
+          question:
+            "Sự ổn định chính trị tuyệt đối có thể trở thành rào cản cho phát triển bền vững nếu:",
+          options: [
+            "A. Ổn định là điều kiện tiên quyết thu hút vốn",
+            "B. Chậm cải cách hành chính làm tăng chi phí, giảm cạnh tranh",
+            "C. Dù cải cách chậm, vẫn an toàn về tài sản",
+            "D. Cả hai đều là tiềm lực",
+          ],
           correct: 1,
         },
         {
-          question: "Động vật nào có vòi?",
-          options: ["Sư tử", "Voi", "Hổ", "Gấu"],
+          id: 13,
+          question:
+            "Tỷ lệ hộ nghèo giảm, GDP tăng mạnh nhưng phân bố không đồng đều phản ánh điều gì?",
+          options: [
+            "A. Sức mạnh toàn dân",
+            "B. Sự chênh lệch trong tiềm lực nhân văn",
+            "C. Kết quả cải cách kinh tế không hiệu quả",
+            "D. Chỉ số xuất khẩu tăng",
+          ],
           correct: 1,
         },
         {
-          question: "3 x 3 = ?",
-          options: ["6", "9", "12", "15"],
+          id: 14,
+          question:
+            "Việt Nam hoàn tất 14 Đối tác Chiến lược Toàn diện năm 2025 chứng minh:",
+          options: [
+            "A. Vị thế quốc tế được nâng cao",
+            "B. Tiềm lực nội tại tăng nhanh",
+            "C. Chưa có uy tín trên trường quốc tế",
+            "D. Cơ đồ chưa được khẳng định",
+          ],
+          correct: 0,
+        },
+        {
+          id: 15,
+          question: "Chỉ số tăng trưởng GDP năm 2024 so với 1986 cho thấy:",
+          options: [
+            "A. Cơ đồ và vị thế quốc tế cải thiện",
+            "B. Uy tín quốc tế không thay đổi",
+            "C. Tiềm lực nội tại chưa tăng",
+            "D. Chưa thể so sánh",
+          ],
+          correct: 0,
+        },
+        {
+          id: 16,
+          question: "Việt Nam gia nhập WTO năm 2007 đã:",
+          options: [
+            "A. Chỉ chấp nhận luật chơi",
+            "B. Tạo nền tảng để kiến tạo luật chơi",
+            "C. Không ảnh hưởng gì đến cơ đồ",
+            "D. Giảm vị thế quốc tế",
+          ],
           correct: 1,
         },
         {
-          question: "Nước nào có tháp Eiffel?",
-          options: ["Anh", "Pháp", "Ý", "Đức"],
+          id: 17,
+          question:
+            "Tổng Bí thư nhấn mạnh “chưa bao giờ có cơ đồ…” là dựa trên yếu tố nào?",
+          options: [
+            "A. Sự ổn định chính trị",
+            "B. Tăng trưởng kinh tế bền vững",
+            "C. Quan hệ quốc tế và uy tín",
+            "D. Tất cả đều đúng",
+          ],
+          correct: 3,
+        },
+        {
+          id: 18,
+          question:
+            "Giai đoạn 1986-2024, điều gì phản ánh rõ nhất “tiềm lực” của Việt Nam?",
+          options: [
+            "A. Quy mô GDP",
+            "B. FDI thực hiện",
+            "C. Tỷ lệ xuất khẩu",
+            "D. Cả ba đều đúng",
+          ],
+          correct: 3,
+        },
+        {
+          id: 19,
+          question: "Sự khác biệt GDP giữa các vùng địa lý chứng minh:",
+          options: [
+            "A. Cơ đồ chưa vững",
+            "B. Tiềm lực nhân văn chưa đồng đều",
+            "C. Vị thế quốc tế giảm",
+            "D. Uy tín quốc tế chưa hình thành",
+          ],
           correct: 1,
         },
         {
-          question: "10 - 5 = ?",
-          options: ["3", "4", "5", "6"],
-          correct: 2,
-        },
-        {
-          question: "Con vật nào bay được?",
-          options: ["Chó", "Mèo", "Chim", "Cá"],
-          correct: 2,
-        },
-        {
-          question: "Số ngày trong một tuần?",
-          options: ["5", "6", "7", "8"],
-          correct: 2,
-        },
-        {
-          question: "Màu của lá cây là gì?",
-          options: ["Đỏ", "Xanh", "Vàng", "Đen"],
-          correct: 1,
+          id: 20,
+          question:
+            "Các thành tựu kinh tế, chính trị và đối ngoại của Việt Nam được sử dụng để:",
+          options: [
+            "A. Kiểm chứng nhận định lịch sử của Tổng Bí thư",
+            "B. Chỉ ra khuyết điểm",
+            "C. Chứng minh thất bại",
+            "D. Không liên quan gì",
+          ],
+          correct: 0,
         },
       ];
 
@@ -469,19 +664,26 @@
       let answeredQuestions = [];
       let availableQuestions = [...allQuestions];
 
+      let keywordScore = 70;
+
       const TIME_LIMIT = 15;
       let timeLeft = TIME_LIMIT;
       let timerInterval = null;
       let isPaused = false;
-      let isTimerStarted = false; // MỚI: Biến kiểm tra timer đã chạy lần đầu chưa
+      let isTimerStarted = false;
 
-      // Khởi tạo ảnh
       const pieces = document.querySelectorAll(".image-content");
       pieces.forEach((piece) => {
         piece.style.backgroundImage = `url(${imageUrl})`;
       });
 
-      // Khởi tạo hiển thị từ khóa
+      function updateScoreDisplay() {
+        const scoreDisplay = document.getElementById("keywordScore");
+        if (scoreDisplay) {
+          scoreDisplay.textContent = `ĐIỂM: ${keywordScore}`;
+        }
+      }
+
       function initKeyword() {
         const display = document.getElementById("keywordDisplay");
         display.innerHTML = "";
@@ -494,17 +696,32 @@
         }
       }
 
-      // Hiển thị chữ cái ngẫu nhiên
+      // (SỬA) Sửa lỗi lật chữ cuối cùng
       function revealRandomLetters() {
-        const lettersPerCorrect = Math.ceil(keyword.length / 6);
+        const revealedPiecesCount = document.querySelectorAll(
+          ".image-piece.revealed"
+        ).length;
+        const totalPieces = document.querySelectorAll(".image-piece").length;
+
         const unrevealedIndices = [];
         for (let i = 0; i < keyword.length; i++) {
           if (!revealedLetters.includes(i)) {
             unrevealedIndices.push(i);
           }
         }
+
+        let lettersToReveal;
+        // Nếu đây là ô cuối cùng (số ô đã lật = tổng số ô)
+        if (revealedPiecesCount === totalPieces) {
+          lettersToReveal = unrevealedIndices.length; // Lật hết số chữ cái còn lại
+        } else {
+          lettersToReveal = 1; // Mặc định vẫn lật 1
+        }
+        // (HẾT SỬA)
+
         let count = 0;
-        while (count < lettersPerCorrect && unrevealedIndices.length > 0) {
+        // (SỬA) Dùng biến lettersToReveal
+        while (count < lettersToReveal && unrevealedIndices.length > 0) {
           const randomIdx = Math.floor(
             Math.random() * unrevealedIndices.length
           );
@@ -520,30 +737,36 @@
         }
       }
 
-      // Lấy câu hỏi ngẫu nhiên
       function getRandomQuestion() {
         if (availableQuestions.length === 0) {
-          availableQuestions = allQuestions.filter(
-            (_, index) => !answeredQuestions.includes(index)
-          );
+          // (SỬA) Tái sử dụng toàn bộ câu hỏi nếu đã hết
+          availableQuestions = [...allQuestions];
+          // Nếu vẫn hết (ví dụ allQuestions rỗng) thì return null
+          if (availableQuestions.length === 0) return null;
         }
-        if (availableQuestions.length === 0) return null;
         const randomIndex = Math.floor(
           Math.random() * availableQuestions.length
         );
-        return availableQuestions[randomIndex];
+        return availableQuestions[randomIndex]; // Trả về câu hỏi
       }
 
-      // Xử lý click vào từng phần ảnh
       document.querySelectorAll(".image-piece").forEach((piece) => {
         piece.addEventListener("click", function () {
           if (this.classList.contains("revealed")) return;
 
           const questionData = getRandomQuestion();
           if (!questionData) {
-            alert("Bạn đã trả lời đúng tất cả câu hỏi!");
+            alert("Đã có lỗi xảy ra, không tìm thấy câu hỏi. Đang tải lại...");
+            // Tạm thời không làm gì nếu không có câu hỏi
             return;
           }
+
+          // (SỬA) Lỗi lặp câu hỏi: Xóa câu hỏi khỏi kho ngay khi hiển thị
+          const availableIndex = availableQuestions.indexOf(questionData);
+          if (availableIndex > -1) {
+            availableQuestions.splice(availableIndex, 1);
+          }
+          // (HẾT SỬA)
 
           currentPiece = this;
           answeredCorrectly = false;
@@ -565,7 +788,6 @@
 
           document.getElementById("modal").classList.add("active");
 
-          /* MỚI: Reset trạng thái đồng hồ, không tự chạy */
           clearInterval(timerInterval);
           timerInterval = null;
           isTimerStarted = false;
@@ -577,7 +799,6 @@
         });
       });
 
-      /* MỚI: Hàm chỉ chứa logic đếm ngược */
       function startCountdown() {
         const timerDisplay = document.getElementById("timerDisplay");
         isPaused = false;
@@ -593,60 +814,49 @@
           if (timeLeft <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
-            timerDisplay.textContent = "0"; // MỚI: Hiển thị số 0
-            timerDisplay.classList.add("ending"); // Đảm bảo số 0 màu đỏ
+            timerDisplay.textContent = "0";
+            timerDisplay.classList.add("ending");
           }
         }, 1000);
       }
 
-      /* MỚI: Thêm sự kiện click cho đồng hồ để Tạm dừng/Tiếp tục */
       document
         .getElementById("timerDisplay")
         .addEventListener("click", function () {
-          // Nếu đã trả lời (có đáp án bị disabled) thì không làm gì cả
           if (document.querySelector(".option.disabled")) {
             return;
           }
 
           if (!isTimerStarted) {
-            // Lần click đầu tiên -> Bắt đầu chạy
             isTimerStarted = true;
             startCountdown();
           } else if (timerInterval) {
-            // Đang chạy -> Tạm dừng
             clearInterval(timerInterval);
             timerInterval = null;
             isPaused = true;
-            // MỚI: Không đổi text, cứ để nguyên số
           } else if (isPaused) {
-            // Đang tạm dừng -> Chạy tiếp
-            // (Không chạy tiếp nếu đã hết giờ)
             if (timeLeft > 0) {
               startCountdown();
             }
           }
         });
 
-      // Xử lý câu trả lời
       function handleAnswer(
         selectedIndex,
         correctIndex,
         optionElement,
         questionData
       ) {
-        // Chỉ chạy nếu đáp án chưa bị disabled
         if (optionElement.classList.contains("disabled")) {
           return;
         }
 
-        // Dừng bộ đếm giờ
         clearInterval(timerInterval);
         timerInterval = null;
         isPaused = false;
-        isTimerStarted = false; // Reset
+        isTimerStarted = false;
         document.getElementById("timerDisplay").classList.remove("ending");
 
-        // Vô hiệu hóa tất cả lựa chọn
         const allOptions = document.querySelectorAll(".option");
         allOptions.forEach((opt) => opt.classList.add("disabled"));
 
@@ -657,10 +867,11 @@
           if (!answeredQuestions.includes(questionIndex)) {
             answeredQuestions.push(questionIndex);
           }
-          const availableIndex = availableQuestions.indexOf(questionData);
-          if (availableIndex > -1) {
-            availableQuestions.splice(availableIndex, 1);
-          }
+          // (SỬA) Xóa dòng code lặp
+          // const availableIndex = availableQuestions.indexOf(questionData);
+          // if (availableIndex > -1) {
+          //   availableQuestions.splice(availableIndex, 1);
+          // }
         } else {
           optionElement.classList.add("incorrect");
           allOptions[correctIndex].classList.add("correct");
@@ -668,42 +879,71 @@
         }
       }
 
-      // Xử lý đóng modal
       document
         .getElementById("closeBtn")
         .addEventListener("click", function () {
-          // Dừng bộ đếm giờ
           clearInterval(timerInterval);
           timerInterval = null;
           isPaused = false;
-          isTimerStarted = false; // Reset
+          isTimerStarted = false;
 
           document.getElementById("modal").classList.remove("active");
 
           if (answeredCorrectly && currentPiece) {
             currentPiece.classList.add("revealed");
-            revealRandomLetters();
+            revealRandomLetters(); // Gọi hàm lật chữ (đã sửa)
+
+            keywordScore -= 10;
+            if (keywordScore < 10) {
+              keywordScore = 10;
+            }
+            updateScoreDisplay();
           }
 
           currentPiece = null;
           answeredCorrectly = false;
 
-          // Xóa các class animation và style
           document.querySelectorAll(".option").forEach((opt) => {
             opt.classList.remove("correct", "incorrect", "disabled");
           });
           document.getElementById("timerDisplay").classList.remove("ending");
         });
 
-      // Đóng modal khi click bên ngoài
-      document.getElementById("modal").addEventListener("click", function (e) {
-        if (e.target === this) {
-          document.getElementById("closeBtn").click();
+      // --- (Các hàm cho nút đáp án - không đổi) ---
+      function revealAllLetters() {
+        for (let i = 0; i < keyword.length; i++) {
+          const letterDiv = document.querySelector(
+            `.keyword-letter[data-index="${i}"]`
+          );
+          if (letterDiv && !letterDiv.classList.contains("revealed")) {
+            letterDiv.textContent = keyword[i];
+            letterDiv.classList.add("revealed");
+          }
         }
-      });
+      }
 
-      // Khởi tạo game
+      function revealAllPieces() {
+        document.querySelectorAll(".image-piece").forEach((piece) => {
+          if (!piece.classList.contains("revealed")) {
+            piece.classList.add("revealed");
+          }
+        });
+      }
+
+      document
+        .getElementById("showAnswerBtn")
+        .addEventListener("click", function () {
+          revealAllLetters();
+          revealAllPieces();
+          keywordScore = 10;
+          updateScoreDisplay();
+          this.disabled = true;
+          this.textContent = "ĐÃ HIỂN THỊ ĐÁP ÁN";
+        });
+      // --- (HẾT) ---
+
       initKeyword();
+      updateScoreDisplay();
     </script>
   </body>
 </html>
